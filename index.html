@@ -14,11 +14,10 @@
 </script>
 <!-- ================================================================ -->
 
-<meta charset="utf-8">
-<meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
 <meta name="keywords" content="sine cosine frequency analyzer">
-<meta name="description" content="temp5" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" /> <!-- mobile-friendly -->
+<meta name="description" content="temp5">
+<meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- mobile-friendly -->
 
 <title>Sum of sines</title>
 
@@ -92,7 +91,7 @@
     font-weight: normal;
   }
   button.no-margin {
-    margin: none;
+    margin: 0px;
   }
   button.transparent {
     font-weight: normal;
@@ -129,7 +128,10 @@
   .element-under-tab {
     padding: 6px;
     /*
-    border: 1px solid red; /* debug */
+    debug
+    border: 1px solid red;
+    */
+    /*
     border-top: 1px solid gray;
     */
   }
@@ -177,7 +179,7 @@ For offline development:
   We use Sliver's setErrorWidget to route top-level errors here.
 -->
 <div id="error-container" class="error">
-  <hr/>
+  <hr>
   <!-- The &times; is a little x -->
   <button
     onClick='
@@ -186,7 +188,7 @@ For offline development:
     '
   > &times; </button>
   <span id="error-text"> </span>
-  <hr/>
+  <hr>
 </div>
 
 <!-- ================================================================ -->
@@ -200,9 +202,9 @@ For offline development:
 <!-- Sliders -->
 <div style="width: 100%">
 
-  <table width="100%">
+  <table style="width:100%">
     <tr>
-      <th width="10%"> &nbsp; </th>
+      <th style="width:10%"> &nbsp; </th>
       <th> <span id="amplitudes_label"> Amplitudes </span> </th>
       <th> <span id="frequencies_label"> Frequencies </span> </th>
       <th> <span id="phases_label"> Phases </span> </th>
@@ -212,19 +214,19 @@ For offline development:
       <td> <span style="color: #e00000"> Signal 1 </span> </td>
       <td>
         <span>
-          <input type="range" id="y1_ampl_slider" class="range-slider" min="0" max="1000" value="500" width="%80">
+          <input type="range" id="y1_ampl_slider" class="range-slider" min="0" max="1000" value="500">
           <span id="y1_ampl_slider_value_display" style="display:inline"> </span>
         </span>
       </td>
       <td>
         <span>
-          <input type="range" id="y1_freq_slider" class="range-slider" min="0" max="1000" value="500" width="%80">
+          <input type="range" id="y1_freq_slider" class="range-slider" min="0" max="1000" value="500">
           <span id="y1_freq_slider_value_display" style="display:inline"> </span>
         </span>
       </td>
       <td>
         <span>
-          <input type="range" id="y1_phz_slider" class="range-slider" min="0" max="1000" value="500" width="%80">
+          <input type="range" id="y1_phz_slider" class="range-slider" min="0" max="1000" value="500">
           <span id="y1_phz_slider_value_display" style="display:inline"> </span>
         </span>
       </td>
@@ -234,19 +236,19 @@ For offline development:
       <td> <span style="color: #008000"> Signal 2 </span> </td>
       <td>
         <span>
-          <input type="range" id="y2_ampl_slider" class="range-slider" min="0" max="1000" value="500" width="%80">
+          <input type="range" id="y2_ampl_slider" class="range-slider" min="0" max="1000" value="500">
           <span id="y2_ampl_slider_value_display" style="display:inline"> </span>
         </span>
       </td>
       <td>
         <span>
-          <input type="range" id="y2_freq_slider" class="range-slider" min="0" max="1000" value="500" width="%80">
+          <input type="range" id="y2_freq_slider" class="range-slider" min="0" max="1000" value="500">
           <span id="y2_freq_slider_value_display" style="display:inline"> </span>
         </span>
       </td>
       <td>
         <span>
-          <input type="range" id="y2_phz_slider" class="range-slider" min="0" max="1000" value="500" width="%80">
+          <input type="range" id="y2_phz_slider" class="range-slider" min="0" max="1000" value="500">
           <span id="y2_phz_slider_value_display" style="display:inline"> </span>
         </span>
       </td>
@@ -256,19 +258,19 @@ For offline development:
       <td> <span style="color: #0000e0"> Signal 3 </span> </td>
       <td>
         <span>
-          <input type="range" id="y3_ampl_slider" class="range-slider" min="0" max="1000" value="500" width="%80">
+          <input type="range" id="y3_ampl_slider" class="range-slider" min="0" max="1000" value="500">
           <span id="y3_ampl_slider_value_display" style="display:inline"> </span>
         </span>
       </td>
       <td>
         <span>
-          <input type="range" id="y3_freq_slider" class="range-slider" min="0" max="1000" value="500" width="%80">
+          <input type="range" id="y3_freq_slider" class="range-slider" min="0" max="1000" value="500">
           <span id="y3_freq_slider_value_display" style="display:inline"> </span>
         </span>
       </td>
       <td>
         <span>
-          <input type="range" id="y3_phz_slider" class="range-slider" min="0" max="1000" value="500" width="%80">
+          <input type="range" id="y3_phz_slider" class="range-slider" min="0" max="1000" value="500">
           <span id="y3_phz_slider_value_display" style="display:inline"> </span>
         </span>
       </td>
@@ -314,21 +316,33 @@ For offline development:
   <div id="about_this_app_expanded_content" style="border: 1px solid gray" class="element-under-tab">
 
     <h1> Sum of sines viewer </h1>
-    <p/>
+    <br>
 
     <p>This is an item in the list</p>
 
     <p>This is the second item in the list</p>
 
-    <p>Here is the JavaScript source code for this app: xxx</p>
-    <p>To draw the graph, this app uses the d3.js JavaScript library:</p>
-    <p>To manage the buttons, sliders, and so on this app uses the Sliver JavaScript library:</p>
+    <p>
+    Here is the JavaScript source code for this app: <a href="https://github.com/johnkerl/sum-of-sines-viewer">
+    github.com/johnkerl/sum-of-sines-viewer.
+    </a>
+    </p>
+
+    <p>
+    To draw the graph, this app uses the d3.js JavaScript library:
+    <a href="https://d3js.org">https://d3js.org</a>.
+    </p>
+
+    <p>
+    To manage the buttons, sliders, and so on this app uses the Sliver JavaScript library:
+    <a href="https://github.com/johnkerl/sliver">github.com/johnkerl/sliver</a>.
+    </p>
 
   </div>
 
 </div>
 
-<p/>
+<br>
 
 <!-- ................................................................ -->
 <!-- Tabs for demos -->
