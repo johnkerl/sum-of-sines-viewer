@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<!-- ================================================================ -->
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-BZ8T9K9XYD"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-BZ8T9K9XYD');
+</script>
+<!-- ================================================================ -->
+
+<meta charset="utf-8">
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
+<meta name="keywords" content="sine cosine frequency analyzer">
+<meta name="description" content="temp5" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" /> <!-- mobile-friendly -->
+
+<title>Sum of sines</title>
+
+<!-- ================================================================ -->
+<!-- INLINE CSS -->
+
+<style>
+  /* BODY */
+  body {
+    color: black;
+    background-color: white;
+    font-family: Verdana, sans-serif;
+    letter-spacing: 0.25px;
+    line-height: 125%;
+  }
+
+  h1 {
+    font-weight: bold;
+    color: #800000;;
+    font-size: 110%;
+    text-align: center;
+    margin: 1em;
+  }
+  h2 {
+    font-weight: bold;
+    color: #800000;;
+    font-size: 105%
+  }
+  h3 {
+    font-weight: bold;
+    color: #800000;;
+    font-size: 100%
+  }
+
+  a:link {
+    color: maroon;
+  }
+  a:visited {
+    color: maroon;
+  }
+  a:active {
+    color: maroon;
+  }
+
+  /* BUTTONS */
+  button {
+    background-color: #e8e8e8;
+    border: 0;
+    padding: 4px;
+    border-radius: 4px;
+    margin: 4px;
+  }
+  button:hover {
+    background-color: #d8d8d8;
+    border: 0;
+    padding: 4px;
+    border-radius: 4px;
+    margin: 4px;
+  }
+  button:active {
+    background-color: #c0c0c0;
+    border: 0;
+    padding: 4px;
+    border-radius: 4px;
+    margin: 4px;
+  }
+  button.selected {
+    font-weight: bold;
+  }
+  button.deselected {
+    font-weight: normal;
+  }
+  button.no-margin {
+    margin: none;
+  }
+  button.transparent {
+    font-weight: normal;
+    border: 0;
+    background-color: transparent;
+  }
+
+  button.tab {
+    font-size: 80%;
+    font-weight: bold;
+    color: black;
+    background-color: #c0c0c0;
+    border: none;
+    border-radius: 0px;
+    margin: 0px !important;
+    padding: 6px;
+    display: inline-block;
+  }
+  button.tab.selected {
+    font-weight: bold;
+    display: inline-block;
+    background-color: white;
+  }
+  button.tab.deselected {
+    font-weight: normal;
+    color: #808080;;
+    background-color: #c0c0c0;
+    display: inline-block;
+  }
+
+  .tab-container {
+    border: 1px solid gray;
+  }
+  .element-under-tab {
+    padding: 6px;
+    /*
+    border: 1px solid red; /* debug */
+    border-top: 1px solid gray;
+    */
+  }
+
+  /* ERROR */
+  .error {
+    color: red;
+    /*
+    background-color: white;
+    */
+    border: none;
+    padding: 10px;
+    margin: 10px;
+  }
+
+  /* RANGE-SLIDER */
+  .range-slider {
+    width: 100%;
+    height: 25px;
+    background: #d3d3d3;
+    outline: none;
+    opacity: 0.7; /* set transparency (for mouse-over effects on hover) */
+    -webkit-transition: .2s; /* 0.2 seconds transition on hover */
+    transition: opacity .2s;
+  }
+  .range-slider:hover {
+    opacity: 1; /* fully shown on mouse-over */
+  }
+</style>
+
+</head>
+
+<!-- ================================================================ -->
+<body>
+<!-- Load d3.js -->
+<!--
+For offline development:
+<script src="./d3.v4.js"></script>
+-->
+<script src="https://d3js.org/d3.v4.js"></script>
+
+<!-- ================================================================ -->
+<!--
+  This is a self-contained widget for error-text and cancel/X button.
+  We use Sliver's setErrorWidget to route top-level errors here.
+-->
+<div id="error-container" class="error">
+  <hr/>
+  <!-- The &times; is a little x -->
+  <button
+    onClick='
+      document.getElementById("error-container").style.display = "none";
+      document.getElementById("error-text").innerHTML = "";
+    '
+  > &times; </button>
+  <span id="error-text"> </span>
+  <hr/>
+</div>
+
+<!-- ================================================================ -->
+<!-- This is where the D3 visualization will be placed -->
+<div id="d3_visualization"></div>
+
+<!-- ================================================================ -->
+<!-- Controls below the D3 visualization -->
+
+<!-- ................................................................ -->
+<!-- Sliders -->
+<div style="width: 100%">
+
+  <table width="100%">
+    <tr>
+      <th width="10%"> &nbsp; </th>
+      <th> <span id="amplitudes_label"> Amplitudes </span> </th>
+      <th> <span id="frequencies_label"> Frequencies </span> </th>
+      <th> <span id="phases_label"> Phases </span> </th>
+    </tr>
+
+    <tr>
+      <td> <span style="color: #e00000"> Signal 1 </span> </td>
+      <td>
+        <span>
+          <input type="range" id="y1_ampl_slider" class="range-slider" min="0" max="1000" value="500" width="%80">
+          <span id="y1_ampl_slider_value_display" style="display:inline"> </span>
+        </span>
+      </td>
+      <td>
+        <span>
+          <input type="range" id="y1_freq_slider" class="range-slider" min="0" max="1000" value="500" width="%80">
+          <span id="y1_freq_slider_value_display" style="display:inline"> </span>
+        </span>
+      </td>
+      <td>
+        <span>
+          <input type="range" id="y1_phz_slider" class="range-slider" min="0" max="1000" value="500" width="%80">
+          <span id="y1_phz_slider_value_display" style="display:inline"> </span>
+        </span>
+      </td>
+    </tr>
+
+    <tr>
+      <td> <span style="color: #008000"> Signal 2 </span> </td>
+      <td>
+        <span>
+          <input type="range" id="y2_ampl_slider" class="range-slider" min="0" max="1000" value="500" width="%80">
+          <span id="y2_ampl_slider_value_display" style="display:inline"> </span>
+        </span>
+      </td>
+      <td>
+        <span>
+          <input type="range" id="y2_freq_slider" class="range-slider" min="0" max="1000" value="500" width="%80">
+          <span id="y2_freq_slider_value_display" style="display:inline"> </span>
+        </span>
+      </td>
+      <td>
+        <span>
+          <input type="range" id="y2_phz_slider" class="range-slider" min="0" max="1000" value="500" width="%80">
+          <span id="y2_phz_slider_value_display" style="display:inline"> </span>
+        </span>
+      </td>
+    </tr>
+
+    <tr>
+      <td> <span style="color: #0000e0"> Signal 3 </span> </td>
+      <td>
+        <span>
+          <input type="range" id="y3_ampl_slider" class="range-slider" min="0" max="1000" value="500" width="%80">
+          <span id="y3_ampl_slider_value_display" style="display:inline"> </span>
+        </span>
+      </td>
+      <td>
+        <span>
+          <input type="range" id="y3_freq_slider" class="range-slider" min="0" max="1000" value="500" width="%80">
+          <span id="y3_freq_slider_value_display" style="display:inline"> </span>
+        </span>
+      </td>
+      <td>
+        <span>
+          <input type="range" id="y3_phz_slider" class="range-slider" min="0" max="1000" value="500" width="%80">
+          <span id="y3_phz_slider_value_display" style="display:inline"> </span>
+        </span>
+      </td>
+    </tr>
+
+    <tr>
+      <th> &nbsp; </th>
+      <th colspan=3>
+        <span id="sample_count_label"> </span>
+      </th>
+    </tr>
+
+    <tr>
+      <td> &nbsp; </td>
+      <td colspan=3>
+        <input type="range" id="sample_count_slider" class="range-slider" min="0" max="1000" value="1000">
+      </td>
+    </tr>
+
+    <tr>
+      <td> &nbsp; </td>
+      <td colspan=3>
+        <span id="sample_count_value_display"> </span>
+      </td>
+    </tr>
+
+  </table>
+</div>
+
+<!-- ................................................................ -->
+<!-- About this app -->
+<div>
+  <div style="border:3px solid gray">
+    <span>
+      <button class="general" id="about_this_app_expander_button"> Loading ... </button>
+      About the sum-of-sines viewer
+    </span>
+  </div>
+
+  <div id="about_this_app_unexpanded_content" style="border: none">
+  </div>
+
+  <div id="about_this_app_expanded_content" style="border: 1px solid gray" class="element-under-tab">
+
+    <h1> Sum of sines viewer </h1>
+    <p/>
+
+    <p>This is an item in the list</p>
+
+    <p>This is the second item in the list</p>
+
+    <p>Here is the JavaScript source code for this app: xxx</p>
+    <p>To draw the graph, this app uses the d3.js JavaScript library:</p>
+    <p>To manage the buttons, sliders, and so on this app uses the Sliver JavaScript library:</p>
+
+  </div>
+
+</div>
+
+<p/>
+
+<!-- ................................................................ -->
+<!-- Tabs for demos -->
+<div class="tab-container">
+
+  <div>
+    <div class="flex-container" style="background-color: #808080">
+      &nbsp;
+      <button class="tab" id="three_sines_tab_button"> Three sines</button>
+      <button class="tab" id="two_sines_tab_button"> Two sines</button>
+      <button class="tab" id="one_sine_tab_button"> One sine</button>
+      <button class="tab" id="nyquist_sampling_tab_button"> Nyquist</button>
+    </div>
+  </div>
+
+  <div class="element-under-tab">
+
+    <div id="three_sines_tab_content">
+    <button id="set_params_default_button"> ... </button>
+    <p> The red, green, and blue add up to make the black. As the red has the most amplitude, with lowest
+    frequency, the green and blue appear as ripples on top of the main wave.</p>
+
+    <button id="set_params_other_three_sines_button"> ... </button>
+    <p> This is another combination of three sines.</p>
+
+    </div>
+
+    <div id="two_sines_tab_content">
+      <button id="set_params_noise_cancellation_button"> ... </button>
+      <p> The sum of two sines with the same frequency is another sine &mdash; even if the phases are different.
+      This is how noise-cancelling headphones work: they try to imitate the surrounding sounds, 180 degrees (half
+      a cycle) out of phase. If you slide Signal 2&rsquo;s phase closer to 0.0 &mdash; or 1.0 &mdash; you'll
+      see how these signals can reinforce one another, rather than cancelling out.</p>
+
+      <button id="set_params_beats_button"> ... </button>
+      <p> The sum of two sines with different frequencies isn&rsquo;t another sine &mdash; rather, you get
+      an outer envelope involving the different in frequencies. That annoying <i>yoing-yoing-yoing</i>
+      when you hear two instruments playing almost the same pitch, just out of tune, are called
+      <a href="https://en.wikipedia.org/wiki/Beat_(acoustics)"> <i>beats</i></a>.</p>
+    </div>
+
+
+    <div id="one_sine_tab_content">
+      <button id="set_params_single_sine_button"> Push me </button>
+      <p> This is a selector for a single sine wave.</p>
+    </div>
+
+    <div id="nyquist_sampling_tab_content">
+      <p> TODO.</p>
+      <!--
+      https://en.wikipedia.org/wiki/Nyquist%E2%80%93Shannon_sampling_theorem
+      https://en.wikipedia.org/wiki/Aliasing
+      -->
+    </div>
+
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<script type=module>
+
+// ================================================================
+// UI WIDGETS
+
+import {
+  Button,
+  GenericElement,
+  NButtonSwitcher,
+  OneButtonSwitcher,
+  RangeSlider,
+  RangeFloatSlider,
+  TextSpan,
+  setErrorWidget,
+} from "/sliver/dev/sliver.js"
+
+setErrorWidget("error-container", "error-text")
+
+// ================================================================
+// UTILITIES
+
+function copyObject(src) {
+  return JSON.parse(JSON.stringify(src))
+}
+
+// ----------------------------------------------------------------
+// It's simpler to create data in a columnar format, like Arrow, Pandas, etc.:
+// {
+//   "column1": [1,2,3],
+//   "column2": [4,5,6],
+// }
+//
+// However, D3 (like Miller https://github.com/johnkerl/miller) takes list-of-dict:
+//
+// [
+//   {"column1": 1, "column2": 4},
+//   {"column1": 2, "column2": 5},
+//   {"column1": 3, "column2": 6},
+// ]
+// This function converts from the former to the latter.
+
+function columnsToD3Format(columns) {
+  const columnNames = Object.keys(columns)
+  const n = columns[columnNames[0]].length
+  let d3format = []
+
+  for (let i = 0; i < n; i++) {
+    let row = {}
+    for (let columnName of columnNames) {
+      const column = columns[columnName]
+      row[columnName] = column[i]
+    }
+    d3format.push(row)
+  }
+  d3format.columns = [...columnNames]
+  return d3format
+}
+
+// ================================================================
+// APP STATE
+
+class App {
+
+  // ----------------------------------------------------------------
+  // Methods for initial state
+  setSizesFromWindow() {
+    if (window.innerWidth != null) {
+      this.state.display.width  = window.innerWidth
+    }
+    if (window.innerHeight != null) {
+      this.state.display.height  = window.innerHeight / 2
+    }
+    this.updateDisplayFromState()
+  }
+
+  DEFAULT_N = 1000
+  FLOAT_SLIDER_GRANULARITY = 100
+  DEFAULT_THREE_SINE_PARAMS = {
+    "y1": { "ampl": 1.0, "freq":  1.4, "phz": 0.0, },
+    "y2": { "ampl": 0.7, "freq":  5.6, "phz": 0.2, },
+    "y3": { "ampl": 0.4, "freq": 18.0, "phz": 0.65, },
+  }
+
+  // ================================================================
+  // Math parts of the app for mapping user-controlled params to d3-formatted dat
+
+  // ----------------------------------------------------------------
+  // This maps user-controlled params to computed data series.
+  // Frequencies phases are in terms of cycles (i.e. multiplying by 2 pi is done inside here).
+  // Compute these in columnar format since that's simpler.
+  // Convert to D3 list-of-dict format separately.
+
+  makeColumns() {
+    const data_n = this.state.n
+    const data_bounds = this.state.data_bounds
+    const params = this.state.sine_params
+
+    let data_x = []
+    let data_y1 = []
+    let data_y2 = []
+    let data_y3 = []
+    let data_y4 = []
+
+    for (let i = 0; i < data_n; i++) {
+      let xx = data_bounds.x.min + i*(data_bounds.x.max - data_bounds.x.min)/data_n
+
+      let yy1 = params.y1.ampl * Math.sin(2 * Math.PI * (params.y1.freq * xx - params.y1.phz))
+      let yy2 = params.y2.ampl * Math.sin(2 * Math.PI * (params.y2.freq * xx - params.y2.phz))
+      let yy3 = params.y3.ampl * Math.sin(2 * Math.PI * (params.y3.freq * xx - params.y3.phz))
+      let yy4 = yy1+yy2+yy3
+
+      data_x.push(xx)
+      data_y1.push(yy1)
+      data_y2.push(yy2)
+      data_y3.push(yy3)
+      data_y4.push(yy4)
+    }
+
+    return {
+      'x':  data_x,
+      'y1': data_y1,
+      'y2': data_y2,
+      'y3': data_y3,
+      'y4': data_y4,
+    }
+  }
+
+  // ----------------------------------------------------------------
+  // Methods to be called by button presses or slider motions.
+
+  updateDisplayFromState() {
+    // Update the sliders in case they were adjusted, not by the user directly
+    // on them, but by a demo button which manipulates multiple parameter values.
+    for (let yi of ["y1", "y2", "y3"]) {
+      for (let param_name of ["ampl", "freq", "phz"]) {
+        this.elements.sliders[param_name][yi].set(this.state.sine_params[yi][param_name])
+      }
+    }
+    this.plotColumns(this.makeColumns())
+  }
+
+  updateFromNewSineParams(new_params) {
+    this.state.sine_params = copyObject(new_params)
+    this.updateDisplayFromState()
+  }
+
+  setThreeSines() {
+    this.updateFromNewSineParams(this.DEFAULT_THREE_SINE_PARAMS)
+  }
+
+  setThreeSinesOther() {
+    this.updateFromNewSineParams(
+      {
+        "y1": { "ampl": 1.00, "freq":  1.00, "phz": 0.0, },
+        "y2": { "ampl": 0.46, "freq":  3.00, "phz": 0., },
+        "y3": { "ampl": 0.10, "freq": 20.00, "phz": 0.0, },
+      }
+    )
+  }
+
+  setNoiseCancellation() {
+    this.updateFromNewSineParams(
+      {
+        "y1": { "ampl": 1.0, "freq": 4.0, "phz": 0.0, },
+        "y2": { "ampl": 1.0, "freq": 4.0, "phz": 0.52, },
+        "y3": { "ampl": 0.0, "freq": 0.0, "phz": 0.0, },
+      }
+    )
+  }
+
+  setBeats() {
+    this.updateFromNewSineParams(
+      {
+        "y1": { "ampl": 1.0, "freq": 10.0, "phz": 0.0, },
+        "y2": { "ampl": 1.0, "freq": 11.0, "phz": 0.5, },
+        "y3": { "ampl": 0.0, "freq": 0.0,  "phz": 0.0, },
+      }
+    )
+  }
+
+  setSingleSine() {
+    this.updateFromNewSineParams(
+      {
+        "y1": { "ampl": 1.0, "freq": 1.0, "phz": 0.0, },
+        "y2": { "ampl": 0.0, "freq": 0.0, "phz": 0.0, },
+        "y3": { "ampl": 0.0, "freq": 0.0, "phz": 0.0, },
+      }
+    )
+  }
+
+  // ================================================================
+  // Map d3-formatted data to d3 visualization
+
+  plotD3Format(d3format) {
+    // Set the dimensions and margins of the graph
+    const box_pixel_width  = this.state.display.width
+    const box_pixel_height = this.state.display.height
+
+    const pixel_margin = {top: 10, right: 30, bottom: 30, left: 60}
+    const plot_pixel_width  = box_pixel_width - pixel_margin.left - pixel_margin.right
+    const plot_pixel_height = box_pixel_height - pixel_margin.top - pixel_margin.bottom
+
+    d3.select("#d3_visualization").html("")
+    var svg = d3.select("#d3_visualization")
+      .append("svg")
+        .attr("width",  box_pixel_width)
+        .attr("height", box_pixel_height)
+      .append("g")
+        .attr("transform",
+              "translate(" + pixel_margin.left + "," + pixel_margin.top + ")");
+
+    // Add X axis
+    var x_axis = d3.scaleLinear()
+      .domain([this.state.data_bounds.x.min, this.state.data_bounds.x.max])
+      .range([0, plot_pixel_width]);
+    svg.append("g")
+      .attr("transform", "translate(0," + plot_pixel_height + ")")
+      .call(d3.axisBottom(x_axis));
+
+    // Add Y axis
+    var y_axis = d3.scaleLinear()
+      .domain([this.state.data_bounds.y.min, this.state.data_bounds.y.max])
+      .range([plot_pixel_height, 0]);
+    svg.append("g")
+      .call(d3.axisLeft(y_axis));
+
+    // Add dots
+    svg.append('g')
+      .selectAll("dot")
+      .data(d3format)
+      .enter()
+      .append("circle")
+        .attr("cx", function (d) { return x_axis(d.x); } )
+        .attr("cy", function (d) { return y_axis(d.y1); } )
+        .attr("r", 1.0)
+        .style("fill", "#e00000")
+
+    svg.append('g')
+      .selectAll("dot")
+      .data(d3format)
+      .enter()
+      .append("circle")
+        .attr("cx", function (d) { return x_axis(d.x); } )
+        .attr("cy", function (d) { return y_axis(d.y2); } )
+        .attr("r", 1.0)
+        .style("fill", "#008000")
+
+    svg.append('g')
+      .selectAll("dot")
+      .data(d3format)
+      .enter()
+      .append("circle")
+        .attr("cx", function (d) { return x_axis(d.x); } )
+        .attr("cy", function (d) { return y_axis(d.y3); } )
+        .attr("r", 1.0)
+        .style("fill", "#0000e0")
+
+    svg.append('g')
+      .selectAll("dot")
+      .data(d3format)
+      .enter()
+      .append("circle")
+        .attr("cx", function (d) { return x_axis(d.x); } )
+        .attr("cy", function (d) { return y_axis(d.y4); } )
+        .attr("r", 2.0)
+        .style("fill", "#404040")
+
+  }
+
+  plotColumns(columns) {
+    const d3format = columnsToD3Format(columns)
+    this.plotD3Format(d3format)
+  }
+
+  // ----------------------------------------------------------------
+  constructor() {
+
+    this.state = {
+      // This is in terms of pixels
+      display: {
+        width : 800,
+        height: 500
+      },
+      data_bounds: {
+        n: {min: 2, max: 1000},
+        // These are in terms of floating-point values which are mapped to pixels by d3
+        x: {min: 0.0, max: 1.0},
+        y: {min: -3.0, max: 3.0},
+      },
+      slider_bounds: {
+        ampl: {lo: 0.0, hi: 1.0},
+        freq: {lo: 0.0, hi: 20.0},
+        phz:  {lo: 0.0, hi: 1.0},
+      },
+      n: this.DEFAULT_N,
+      sine_params: copyObject(this.DEFAULT_THREE_SINE_PARAMS),
+    }
+
+    // ----------------------------------------------------------------
+    // Put the Sliver classes for elements into one object for convenience
+    this.elements = {}
+
+    // ----------------------------------------------------------------
+    // Sine-parameter sliders
+
+    this.elements.sliders = { "ampl": {}, "freq": {}, "phz": {} }
+    this.elements.labels = {}
+
+    this.elements.labels.sample_count_label = new TextSpan(
+      "sample_count_label",
+      "Sample count ["
+        + this.state.data_bounds.n.min
+        + " ..  "
+        + this.state.data_bounds.n.max
+        + "]",
+    )
+
+    this.elements.labels.ampl= new TextSpan(
+      "amplitudes_label",
+      "Amplitudes ["
+        + this.state.slider_bounds.ampl.lo.toFixed(2)
+        + " ..  "
+        + this.state.slider_bounds.ampl.hi.toFixed(2)
+        + "]",
+    )
+
+    this.elements.labels.freq = new TextSpan(
+      "frequencies_label",
+      "Frequencies ["
+        + this.state.slider_bounds.freq.lo.toFixed(2)
+        + " .. "
+        + this.state.slider_bounds.freq.hi.toFixed(2)
+        + "]",
+    )
+
+    this.elements.labels.phz= new TextSpan(
+      "phases_label",
+      "Phases ["
+        + this.state.slider_bounds.phz.lo.toFixed(2)
+        + " .. "
+        + this.state.slider_bounds.phz.hi.toFixed(2)
+        + "]",
+    )
+
+    for (let yi of ["y1", "y2", "y3"]) {
+      for (let param_name of ["ampl", "freq", "phz"]) {
+        this.elements.sliders[param_name][yi] = new RangeFloatSlider(
+          yi + "_" + param_name + "_slider",
+          this.state.slider_bounds[param_name].lo,
+          this.state.sine_params[yi][param_name],
+          this.state.slider_bounds[param_name].hi,
+          this.FLOAT_SLIDER_GRANULARITY,
+          (value) => {
+            this.state.sine_params[yi][param_name] = value
+            this.updateDisplayFromState()
+          },
+          yi + "_" + param_name + "_slider_value_display",
+          (value) => value.toFixed(2),
+        )
+      }
+    }
+
+    // ----------------------------------------------------------------
+    // Sample-count slider
+    this.elements.sample_count_slider = new RangeSlider(
+      "sample_count_slider",
+      this.state.data_bounds.n.min,
+      this.state.n,
+      this.state.data_bounds.n.max,
+      (event) => {
+        this.state.n = sample_count_slider.get()
+        this.updateDisplayFromState
+      },
+      "sample_count_value_display",
+    )
+
+    // ----------------------------------------------------------------
+    // About this app
+    this.elements.about_this_app_expander_button = new OneButtonSwitcher(
+      "about_this_app_expander_button",
+      [
+        new GenericElement("about_this_app_unexpanded_content"),
+      ],
+      [
+        new GenericElement("about_this_app_expanded_content"),
+      ],
+      "▷", // Unicode "&#9655;"
+      "▽", // Unicode "&#9661;"
+      () => { },
+    )
+
+    // ----------------------------------------------------------------
+    // Demo buttons, within tabs
+
+    this.elements.set_params_default_button = new Button(
+      "set_params_default_button",
+      "Reset to default",
+      (event) => { this.setThreeSines() },
+    )
+
+    this.elements.set_params_other_three_sines_button= new Button(
+      "set_params_other_three_sines_button",
+      "Another combination",
+      (event) => { this.setThreeSinesOther() },
+    )
+
+    this.elements.set_params_noise_cancellation_button = new Button(
+      "set_params_noise_cancellation_button",
+      "Noise cancellation",
+      (event) => { this.setNoiseCancellation() },
+    )
+
+    this.elements.set_params_beats_button = new Button(
+      "set_params_beats_button",
+      "Beats",
+      (event) => { this.setBeats() },
+    )
+
+    this.elements.set_params_single_sine_button = new Button(
+      "set_params_single_sine_button",
+      "Reset to single sine",
+      (event) => { this.setSingleSine() },
+    )
+
+    this.elements.NButtonSwitcher_2 = new NButtonSwitcher(
+      {
+        "three_sines_tab_button": {
+          "text": null, // Use HTML
+          "items": [
+            new GenericElement("three_sines_tab_content"),
+          ],
+          "callback": (event) => { this.setThreeSines() },
+        },
+        "two_sines_tab_button": {
+          "text": null, // Use HTML
+          "items": [
+            new GenericElement("two_sines_tab_content"),
+          ],
+          "callback": (event) => { this.setBeats() },
+        },
+        "one_sine_tab_button": {
+          "text": null, // Use HTML
+          "items": [
+            new GenericElement("one_sine_tab_content"),
+          ],
+          "callback": (event) => { this.setSingleSine() },
+        },
+        "nyquist_sampling_tab_button": {
+          "text": null, // Use HTML
+          "items": [
+            new GenericElement("nyquist_sampling_tab_content"),
+          ],
+          "callback": (event) => {
+            // TBW
+          },
+        },
+      },
+      "selected",   // CSS style
+      "deselected", // CSS style
+    )
+
+    // ----------------------------------------------------------------
+    // Draw the default plot
+    this.setSizesFromWindow()
+
+    // This runs when the user resizes the window.
+    // TODO: debounce this
+    window.addEventListener('resize', function(e) {
+      window.app.setSizesFromWindow()
+      window.app.updateDisplayFromState()
+    })
+
+    this.updateDisplayFromState()
+
+  } // end constructor
+}
+
+// ================================================================
+const app = new App()
+// Expose from module visibility to top-level visibility for Console use
+window.app = app
+
+</script>
+
+</body>
+</html>
