@@ -174,6 +174,10 @@ For offline development:
 <script src="https://d3js.org/d3.v4.js"></script>
 
 <!-- ================================================================ -->
+<!-- This is where the D3 visualization will be placed -->
+<div id="d3_visualization"></div>
+
+<!-- ================================================================ -->
 <!--
   This is a self-contained widget for error-text and cancel/X button.
   We use Sliver's setErrorWidget to route top-level errors here.
@@ -190,10 +194,6 @@ For offline development:
   <span id="error-text"> </span>
   <hr>
 </div>
-
-<!-- ================================================================ -->
-<!-- This is where the D3 visualization will be placed -->
-<div id="d3_visualization"></div>
 
 <!-- ================================================================ -->
 <!-- Controls below the D3 visualization -->
@@ -318,25 +318,30 @@ For offline development:
     <h1> Sum of sines viewer </h1>
     <br>
 
-    <p>This is an item in the list</p>
-
-    <p>This is the second item in the list</p>
-
     <p>
-    Here is the JavaScript source code for this app: <a href="https://github.com/johnkerl/sum-of-sines-viewer">
-    github.com/johnkerl/sum-of-sines-viewer.
-    </a>
+    This app gives you an opportunity to play around with superimposed sine waves. You can control the
+    amplitudes, frequencies, and phases, as well as the sampling rate.
     </p>
 
-    <p>
-    To draw the graph, this app uses the d3.js JavaScript library:
-    <a href="https://d3js.org">https://d3js.org</a>.
-    </p>
+    <p>Software components:</p>
 
-    <p>
-    To manage the buttons, sliders, and so on this app uses the Sliver JavaScript library:
-    <a href="https://github.com/johnkerl/sliver">github.com/johnkerl/sliver</a>.
-    </p>
+    <ul>
+
+      <li>
+      The JavaScript source code for this app is available
+      <a href="https://github.com/johnkerl/sum-of-sines-viewer"> on GitHub</a>.
+      </li>
+
+      <li>
+      To draw the graph, this app uses the <a href="https://d3js.org">d3.js JavaScript library</a>.
+      </li>
+
+      <li>
+      To manage the buttons, sliders, and so on this app uses the
+      <a href="https://github.com/johnkerl/sliver">Sliver JavaScript library</a>.
+      </li>
+
+    </ul>
 
   </div>
 
@@ -361,33 +366,76 @@ For offline development:
   <div class="element-under-tab">
 
     <div id="three_sines_tab_content">
-    <button id="set_params_default_button"> ... </button>
-    <p> The red, green, and blue add up to make the black. As the red has the most amplitude, with lowest
-    frequency, the green and blue appear as ripples on top of the main wave.</p>
 
-    <button id="set_params_other_three_sines_button"> ... </button>
-    <p> This is another combination of three sines.</p>
+      <table>
+        <tr>
+          <td>
+            <button id="set_params_default_button"> ... </button>
+          </td>
+          <td>
+            <p> The red, green, and blue add up to make the black. As the red has the most amplitude, with lowest
+            frequency, the green and blue appear as ripples on top of the main wave.
+            This is the default demo when you load this page; you can play with any of the controls as
+            you wish.
+            </p>
+          </td>
+        </tr>
+
+        <tr>
+          <td>
+            <button id="set_params_other_three_sines_button"> ... </button>
+          </td>
+          <td>
+            <p> This is another combination of three sines.</p>
+          </td>
+        </tr>
+      </table>
 
     </div>
 
     <div id="two_sines_tab_content">
-      <button id="set_params_noise_cancellation_button"> ... </button>
-      <p> The sum of two sines with the same frequency is another sine &mdash; even if the phases are different.
-      This is how noise-cancelling headphones work: they try to imitate the surrounding sounds, 180 degrees (half
-      a cycle) out of phase. If you slide Signal 2&rsquo;s phase closer to 0.0 &mdash; or 1.0 &mdash; you'll
-      see how these signals can reinforce one another, rather than cancelling out.</p>
+      <table>
+        <tr>
+          <td>
+            <button id="set_params_noise_cancellation_button"> ... </button>
+          </td>
+          <td>
+            <p> The sum of two sines with the same frequency
+            <a href="https://en.wikipedia.org/wiki/List_of_trigonometric_identities#Sine_and_cosine">is another sine</a>
+            &mdash; even if the phases are different.  This is how noise-cancelling headphones work:
+            they try to imitate the surrounding sounds, 180 degrees (half a cycle) out of phase. If
+            you slide Signal 2&rsquo;s phase closer to 0.0 &mdash; or 1.0 &mdash; you'll see how
+            these signals can reinforce one another, rather than cancelling out.</p>
+          </td>
+        </tr>
 
-      <button id="set_params_beats_button"> ... </button>
-      <p> The sum of two sines with different frequencies isn&rsquo;t another sine &mdash; rather, you get
-      an outer envelope involving the different in frequencies. That annoying <i>yoing-yoing-yoing</i>
-      when you hear two instruments playing almost the same pitch, just out of tune, are called
-      <a href="https://en.wikipedia.org/wiki/Beat_(acoustics)"> <i>beats</i></a>.</p>
+        <tr>
+          <td>
+            <button id="set_params_beats_button"> ... </button>
+          </td>
+          <td>
+            <p> The sum of two sines with different frequencies isn&rsquo;t another sine &mdash;
+            rather, you get an outer envelope involving the different in frequencies. That annoying
+            <i>yoing-yoing-yoing</i> when you hear two instruments playing almost the same pitch,
+            just out of tune, are called <a href="https://en.wikipedia.org/wiki/Beat_(acoustics)">
+            <i>beats</i></a>.</p>
+          </td>
+        </tr>
+      </table>
     </div>
 
 
     <div id="one_sine_tab_content">
-      <button id="set_params_single_sine_button"> Push me </button>
-      <p> This is a selector for a single sine wave.</p>
+      <table>
+        <tr>
+          <td>
+            <button id="set_params_single_sine_button"> Push me </button>
+          </td>
+          <td>
+            <p> This is a selector for a single sine wave.</p>
+          </td>
+        </tr>
+      </table>
     </div>
 
     <div id="nyquist_sampling_tab_content">
@@ -772,7 +820,7 @@ class App {
       this.state.n,
       this.state.data_bounds.n.max,
       (event) => {
-        this.state.n = sample_count_slider.get()
+        this.state.n = this.elements.sample_count_slider.get()
         this.updateDisplayFromState
       },
       "sample_count_value_display",
