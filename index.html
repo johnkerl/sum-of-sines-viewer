@@ -287,7 +287,7 @@ For offline development:
     <td colspan=2>
       <input type="range" id="sample_count_slider" class="range-slider" min="0" max="1000" value="1000">
     </td>
-    <td> <input type="number" id="sample_count_range_input"/> </td>
+    <td> <input type="number" id="sample_count_range_input"> </td>
   </tr>
 
 </table>
@@ -495,12 +495,110 @@ For offline development:
       </table>
     </div>
 
-    <div id="nyquist_sampling_tab_content">
-      <p> TODO.</p>
-      <!--
-      https://en.wikipedia.org/wiki/Nyquist%E2%80%93Shannon_sampling_theorem
-      https://en.wikipedia.org/wiki/Aliasing
-      -->
+    <div id="sampling_tab_content">
+      <table>
+
+        <tr>
+          <td>
+            &nbsp;
+          </td>
+          <td>
+            <p> For me, this part is the most fun! The other demos show examples of varying amplitude,
+            frequency, and phase. Here we look into what can get weird, even for something as seemingly
+            simple as a single sine wave.
+          </td>
+        </tr>
+
+        <tr>
+          <td>
+            <button id="set_params_sampling_1000"> 1000 </button>
+          </td>
+          <td>
+            <p> Click here to show a single sine wave with highest sampling: 1000 data points.
+            The frequency is 10 and you can see 10 peaks of the sine wave.</p>
+          </td>
+        </tr>
+
+        <tr>
+          <td>
+            <button id="set_params_sampling_500"> 500 </button>
+          </td>
+          <td>
+            <p> Click here to show that same single sine wave, but sampled at 500 data points.
+            You can still see 10 peaks of the sine wave.</p>
+          </td>
+        </tr>
+
+        <tr>
+          <td>
+            <button id="set_params_sampling_100"> 100 </button>
+          </td>
+          <td>
+            <p> Click here to show that same single sine wave sampled at 100 data points.
+            You can still see 10 peaks of the sine wave but it&rsquo;s getting grainy.</p>
+          </td>
+        </tr>
+
+        <tr>
+          <td>
+            <button id="set_params_sampling_40"> 40 </button>
+          </td>
+          <td>
+            <p> Click here to show that same single sine wave sampled at 40 data points.
+            It&rsquo;s really grainy but you can still see the peaks and the troughs.
+            What happens if you vary Signal 1&rsquo;s phase?
+            </p>
+          </td>
+        </tr>
+
+        <tr>
+          <td>
+            <button id="set_params_sampling_20"> 20 </button>
+          </td>
+          <td>
+            <p> Click here to show that same single sine wave sampled at 20 data points.
+            What happened?!?
+            Try varying Signal 1&rsquo;s phase.
+            </p>
+          </td>
+        </tr>
+
+        <tr>
+          <td>
+            <button id="set_params_sampling_22"> 22</button>
+          </td>
+          <td>
+            <p> With sampling at 20 data points, it looks like there are two waves, each with
+            <i>two</i> peaks.
+            </p>
+          </td>
+        </tr>
+
+        <tr>
+          <td>
+            <button id="set_params_sampling_17"> 17</button>
+          </td>
+          <td>
+            <p> With sampling at 17 data points, it looks like there are two waves, each with
+            <i>three</i> peaks.  </p>
+          </td>
+        </tr>
+
+        <tr>
+          <td>
+            &nbsp;
+          </td>
+          <td>
+            <p> You can read more about this in the Wikipedia articles on
+              <a href="https://en.wikipedia.org/wiki/Aliasing">aliasing</a> and the
+              <a href="https://en.wikipedia.org/wiki/Nyquist%E2%80%93Shannon_sampling_theorem">
+                Nyquist-Shannon sampling theorem
+              </a>.
+            </p>
+          </td>
+        </tr>
+
+      </table>
     </div>
 
   </div>
@@ -574,12 +672,19 @@ class App {
   // ----------------------------------------------------------------
   // Methods for initial state
   setSizesFromWindow() {
-    if (window.innerWidth != null) {
-      this.state.display.width  = window.innerWidth
+
+    // Various options tried:
+    // * window.innerWidth and window.innerHeight
+    // * window.visualViewport.width and window.visualViewport.height
+    // * window.screen.width and window.screen.height
+    // All seem good on desktop. The third seems best for mobile.
+    if (window.screen.width != null) {
+      this.state.display.width = window.screen.width
     }
-    if (window.innerHeight != null) {
-      this.state.display.height  = window.innerHeight / 2
+    if (window.screen.height!= null) {
+      this.state.display.height = window.screen.height / 2
     }
+
     this.updateDisplayFromState()
   }
 
@@ -641,16 +746,24 @@ class App {
   updateDisplayFromState() {
     // Update the sliders in case they were adjusted, not by the user directly
     // on them, but by a demo button which manipulates multiple parameter values.
+    this.elements.sample_count_range_input.set(this.state.n)
+    this.elements.sample_count_slider.set(this.state.n)
     for (let yi of ["y1", "y2", "y3"]) {
       for (let param_name of ["ampl", "freq", "phz"]) {
         this.elements.sliders[param_name][yi].set(this.state.sine_params[yi][param_name])
       }
     }
+
     this.plotColumns(this.makeColumns())
   }
 
   updateFromNewSineParams(new_params) {
     this.state.sine_params = copyObject(new_params)
+    this.updateDisplayFromState()
+  }
+
+  updateSamplingRate(new_n) {
+    this.state.n = new_n
     this.updateDisplayFromState()
   }
 
@@ -692,8 +805,7 @@ class App {
     this.updateFromNewSineParams(
       {
         "y1": { "ampl": 1.0, "freq": 10.0, "phz": 0.0, },
-        "y2": { "ampl": 1.0, "freq": 11.0, "phz": 0.5, },
-        "y3": { "ampl": 0.0, "freq": 0.0,  "phz": 0.0, },
+        "y2": { "ampl": 1.0, "freq": 11.0, "phz": 0.5, }, "y3": { "ampl": 0.0, "freq": 0.0,  "phz": 0.0, },
       }
     )
   }
@@ -706,6 +818,16 @@ class App {
         "y3": { "ampl": 0.0, "freq": 0.0, "phz": 0.0, },
       }
     )
+  }
+
+  setSamplingDemo(n) {
+    this.state.sine_params = {
+      "y1": { "ampl": 1.0, "freq": 10.0, "phz": 0.0, },
+      "y2": { "ampl": 0.0, "freq":  0.0, "phz": 0.0, },
+      "y3": { "ampl": 0.0, "freq":  0.0, "phz": 0.0, },
+    }
+    this.state.n = n
+    this.updateDisplayFromState()
   }
 
   // ================================================================
@@ -966,7 +1088,17 @@ class App {
       (event) => { this.setSingleSine() },
     )
 
-    this.elements.NButtonSwitcher_2 = new NButtonSwitcher(
+    for (let n of [1000, 500, 100, 40, 20, 22, 17]) {
+      this.elements["set_params_sampling_" + n] = new Button(
+        "set_params_sampling_" + n,
+        null, // use HTML
+        (event) => {
+          this.setSamplingDemo(n)
+        },
+      )
+    }
+
+    this.elements.tab_switcher= new NButtonSwitcher(
       {
         "three_sines_tab_button": {
           "text": null, // Use HTML
@@ -992,10 +1124,10 @@ class App {
         "sampling_tab_button": {
           "text": null, // Use HTML
           "items": [
-            new GenericElement("nyquist_sampling_tab_content"),
+            new GenericElement("sampling_tab_content"),
           ],
           "callback": (event) => {
-            // TBW
+            this.setSamplingDemo(this.DEFAULT_N)
           },
         },
       },
