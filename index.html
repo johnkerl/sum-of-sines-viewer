@@ -290,14 +290,6 @@ For offline development:
     <td> <input type="number" id="sample_count_range_input"/> </td>
   </tr>
 
-  <tr>
-    <td> &nbsp; </td>
-    <td> &nbsp; </td>
-    <td colspan=2>
-      <span id="sample_count_value_display"> </span>
-    </td>
-  </tr>
-
 </table>
 
 <!-- ................................................................ -->
@@ -889,6 +881,9 @@ class App {
     }
 
     // ----------------------------------------------------------------
+    // These two elements control the same parameter. One nicer for coarse
+    // adjustment; the other nicer for fine adjustment.
+
     // Sample-count slider
     this.elements.sample_count_slider = new RangeSlider(
       "sample_count_slider",
@@ -901,7 +896,6 @@ class App {
         this.elements.sample_count_range_input.set(n)
         this.updateDisplayFromState()
       },
-      "sample_count_value_display",
     )
 
     // Sample-count range input
