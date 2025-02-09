@@ -16,7 +16,7 @@
 
 <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
 <meta name="keywords" content="sine cosine frequency analyzer">
-<meta name="description" content="temp5">
+<meta name="description" content="Sum-of-sines viewer">
 <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- mobile-friendly -->
 
 <title>Sum of sines</title>
@@ -210,7 +210,7 @@ For offline development:
   </tr>
 
   <tr>
-    <td> <span style="color: #e00000"> Signal 1 </span> </td>
+    <td> <span style="color: #ff7f50"> Signal 1 </span> </td>
     <td>
       <span>
         <input type="range" id="y1_ampl_slider" class="range-slider" min="0" max="1000" value="500">
@@ -354,7 +354,7 @@ For offline development:
       <li>
         The sample count is how many values of <i>x</i> are plotted. There are two controls for this:
         the slider makes it easy to swing the sample-count widely, all the way from lowest to highest.
-        The text box (with up-arrow and down-arrow) make it easy to adjust the sample count by just a little bit.
+        The text box (with up-arrow and down-arrow) makes it easy to adjust the sample count by just a little bit.
       </li>
 
     </ul>
@@ -664,6 +664,11 @@ function columnsToD3Format(columns) {
   return d3format
 }
 
+function isMobile() {
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
+
+
 // ================================================================
 // APP STATE
 
@@ -673,17 +678,21 @@ class App {
   // Methods for initial state
   setSizesFromWindow() {
 
-    // Various options tried:
-    // * window.innerWidth and window.innerHeight
-    // * window.visualViewport.width and window.visualViewport.height
-    // * window.screen.width and window.screen.height
-    // All seem good on desktop. The third seems best for mobile.
-    if (window.screen.width != null) {
-      this.state.display.width = window.screen.width
+    // console.log(
+    //   "wi:" + window.innerWidth + "," + window.innerHeight +
+    //   " wvv:" + window.visualViewport.width + "," + window.visualViewport.height,
+    //   " ws:"  + window.screen.width + "," + window.screen.height
+    // )
+
+    let w = 800
+    let h = 500
+    if (isMobile()) {
+      [w, h] = [window.screen.width, window.screen.height]
+    } else {
+      [w, h] = [window.innerWidth, window.innerHeight]
     }
-    if (window.screen.height!= null) {
-      this.state.display.height = window.screen.height / 2
-    }
+    this.state.display.width  = w
+    this.state.display.height = h / 2
 
     this.updateDisplayFromState()
   }
@@ -1055,7 +1064,10 @@ class App {
     this.elements.set_params_default_button = new Button(
       "set_params_default_button",
       null, // use HTML
-      (event) => { this.setThreeSines() },
+      (event) => {
+        this.state.n = this.DEFAULT_N
+        this.setThreeSines()
+      },
     )
 
     this.elements.set_params_other_three_sines_button= new Button(
